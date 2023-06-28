@@ -942,8 +942,29 @@ int main(int argc, char** argv) {
             } else if(!tryFetchNextToken(input, i, token)) {
                 std::cerr << "Error, could not parse line [" + std::to_string(assemLineNum) + "]: '" << input << "'" << std::endl;
                 return 1;
+            } else if(token == "noop") {
+                expOp = "noop";
+                macQueue.push(assemLineNum, num2macString(op_noop), "noop");
+                continue;
+            } else if(token == "add") {
+                expOp = "add";
+                macQueue.push(assemLineNum, num2macString(op_add), "add");
+                continue;
+            } else if(token == "sub") {
+                expOp = "sub";
+                macQueue.push(assemLineNum, num2macString(op_sub), "sub");
+                continue;
+            } else if(token == "popinh") {
+                expOp = "popinh";
+                macQueue.push(assemLineNum, num2macString(op_popinh), "popinh");
+                continue;
+            } else if(token == "halt") {
+                expOp = "halt";
+                macQueue.push(assemLineNum, num2macString(op_halt), "halt");
+                continue;
             } else if(token == "pushimm") {
                 expOp = "pushimm";
+                exp2Byte = false;
                 exp1Byte = true;
                 macQueue.push(assemLineNum, num2macString(op_pushimm), "pushimm");
                 continue;
@@ -952,6 +973,18 @@ int main(int argc, char** argv) {
                 exp2Byte = true;
                 exp1Byte = false;
                 macQueue.push(assemLineNum, num2macString(op_pushext), "pushext");
+                continue;
+            } else if(token == "popext") {
+                expOp = "popext";
+                exp2Byte = true;
+                exp1Byte = false;
+                macQueue.push(assemLineNum, num2macString(op_popext), "popext");
+                continue;
+            } else if(token == "jnz") {
+                expOp = "jnz";
+                exp2Byte = true;
+                exp1Byte = false;
+                macQueue.push(assemLineNum, num2macString(op_jnz), "jnz");
                 continue;
             } else {
                 std::cerr << "Error on line [" << assemLineNum << "]: unrecognized token: '" << token << "'" << std::endl;

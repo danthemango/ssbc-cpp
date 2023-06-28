@@ -11,21 +11,19 @@ pushext 0x02 ; ex2
 pushext 0x0200 ; ex1
 0x02
 -1
-; popext 0x0200
-; jnz 0x0007 ; comments1
-; #mytag1 jnz 0x0007 ; comments2
-; #mytag2 jnz ; comments3
-; jnz #mytag6 ; comments3
-; popext 0xFFFE
-; popext 0x0201
-; popext 0x0200
-; popext #mytag2
-; halt
-; noop
-; pushext 0x0201
-; add
-; sub
-; popinh
+popext 0x0200
+jnz 0x0007 ; comments1
+#mytag1 jnz 0x0007 ; comments2
+jnz @cbsNews ; comments3
+popext 0xFFFE
+popext 0x0201
+popext 0x0200
+halt
+noop
+pushext 0x0201
+add
+sub
+popinh
 
 255
 pushext
