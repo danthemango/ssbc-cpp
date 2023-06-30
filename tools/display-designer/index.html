@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bullseye!!</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bullseye!!</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+
+    <body>
+        <div class="container">
+            <div class="item" id="left">
+                <div class="column" style="background-color:#aaa;">
+                    <div>
+                        <h2>
+                            8-bit input
+                        </h2>
+                        <div id="options">
+                            <div class="option">
+                                <div class="option-label">
+                                    <label>binary: </label>
+                                </div>
+                                <input id="binary" type="text" maxlength="8" pattern="[02]{0,8}" value="00000000" />
+                            </div>
+                        </div>
+                        <div id="input-lights">
+                            <table>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                    <div>
+                        <h2>
+                            display
+                        </h2>
+                    </div>
+                    <div id="array">
+                        <div id="options">
+                            <div class="option">
+                                <div class="option-label">
+                                    <label for="width">
+                                        width:
+                                    </label>
+                                </div>
+                                <input id="width" type="number" min="1" max="8" value="8" onChange="createTable()" />
+                            </div>
+                            <div class="option">
+                                <div class="option-label">
+                                    <label for="height">
+                                        height:
+                                    </label>
+                                </div>
+                                <input id="height" type="number" min="1" max="8" value="8" onChange="createTable()" />
+                            </div>
+                        </div>
+
+                        <div id="lights">
+                            <table>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="item" id="right" style="padding-left: 15px;">
+                <div>
+                    <h2>
+                        mapped displays:
+                    </h2>
+                </div>
+                <canvas id="canvas"></canvas>
+            </div>
+        </div>
+
+        <script src="script.js"></script>
+    </body>
+
+    </html>

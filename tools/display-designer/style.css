@@ -1,0 +1,116 @@
+#options {
+    font-size: 1.3em;
+    width: 150px;
+  }
+  
+  input {
+    width: 70px;
+  }
+  
+  .option {
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
+  
+  .option-label {
+    width: 70px;
+  }
+  
+  #array {
+    display: grid;
+    grid-template-columns: min-content auto;
+  }
+    
+  td.on {
+    background-color: #ff8888;
+  }
+  
+  td {
+    background-color: #dddddd;
+  }
+  
+  td {
+    height: 50px;
+    width: 50px;
+    border: 1px solid;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  input:invalid {
+    border: 1px solid red;
+  }
+  
+  
+  
+  #options {
+    font-size: 1.3em;
+    width: 150px;
+  }
+  
+  input {
+    width: 70px;
+  }
+  
+  .option {
+    display: grid;
+    grid-template-columns: auto auto auto;
+  }
+  
+  .option-label {
+    width: 70px;
+  }
+  
+  #array {
+    display: grid;
+    grid-template-columns: min-content auto;
+  }
+  
+  td.on {
+    background-color: #ff8888;
+  }
+  
+  td {
+    background-color: #dddddd;
+  }
+  
+  td {
+    height: 50px;
+    width: 50px;
+    border: 1px solid;
+    text-align: left;
+    padding: 8px;
+  }
+  
+  input:invalid {
+    border: 1px solid red;
+  }
+  
+  /* Create two equal columns that floats next to each other */
+  .column {
+    float: left;
+  }
+  
+  #left {
+    width: 600px;
+  }
+  
+  #right{
+    width: 1000px;
+  }
+  
+  .container {
+    width: 100%;
+    display: flex;
+    overflow-x: auto;
+  }
+  
+  .item {
+    width: 100px;
+    flex-shrink: 0;
+  }
+  
+  canvas {
+    width: 960px;
+    height: 960px;
+  }
