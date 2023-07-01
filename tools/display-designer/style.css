@@ -114,3 +114,28 @@
     width: 960px;
     height: 960px;
   }
+
+.alert-button {
+  color: -webkit-link;
+  cursor: pointer;
+}
+
+#enable-circuit-label {
+  user-select: none;
+}
+
+#input-lights td.circ {
+  background-color: #888;
+}
+
+#lights td.circ {
+  background-color: lightsteelblue;
+}
+
+#lights td.circ.selected {
+  background-color: lightcoral;
+}
+
+#circ-pixel-ins.hide {
+  display: none;
+}

@@ -3,6 +3,8 @@ canvas.width = 960;
 canvas.height = 960;
 const ctx = canvas.getContext("2d");
 
+let circuitMode = false;
+
 // num pixels on canvas per segment on display
 const pixelSize = 4;
 // number of pixels between display segments in the canvas
@@ -155,8 +157,44 @@ function updateTableFromCache() {
     }
   }
 
+  // for circuit mode, removes 'select' class from all lights
+function unselectAllDisplay() {
+  const displayLights = Array.from(document.querySelectorAll('#lights td'));
+  displayLights.forEach(el => {
+    if(el.classList.contains('selected')) {
+      el.classList.remove('selected');
+    }
+  })
+}
+
+// get the binary input -> bit sequences object for the specified row and column
+function getPixelObj(col, row) {
+  const outObj = {}
+  for(let [inputHex, tableHex] of Object.entries(cache)) {
+    const inputBinary = hex2binary(inputHex);
+    const thArr = getRowHexArrFromTableHex(tableHex);
+    const rowBinary = thArr.map(i => hex2binary(i))[row];
+    const result = rowBinary[rowBinary.length-1-col];
+    outObj[inputBinary] = result;
+  }
+  console.log(outObj)
+  return outObj;
+}
+
 // switches a light from on to off
 function onDisplaySwitch(el) {
+  if(circuitMode) {
+    // unselect every other light, then select this light
+    unselectAllDisplay();
+    el.classList.add('selected');
+    // add get circuit sequence, and add it to the circuit input
+    const row = el.dataset['row'];
+    const col = el.dataset['col'];
+    const outObj = getPixelObj(col,row);
+    document.querySelector('input#circuit-out').value = getCircuitSequences(outObj);
+    return;
+  }
+
   if(el.classList.contains('on')) {
     el.classList.remove('on');
   } else {
@@ -189,18 +227,20 @@ function getInputLights() {
 }
 
 // returns a light element
-function getNewLight() {
+function getNewLight(c,r) {
   const td = document.createElement('td');
+  td.dataset['col'] = c;
+  td.dataset['row'] = r;
   td.onclick = () => onDisplaySwitch(td);
   return td;
 }
 
 // returns a row of n columns
-function getNewRow() {
+function getNewRow(r) {
   const row = document.createElement('tr');
   const width = getWidth();
-  for(let i = 0; i < width; i++) {
-    row.appendChild(getNewLight());
+  for(let c = 0; c < width; c++) {
+    row.appendChild(getNewLight(c,r));
   }
   return row;
 }
@@ -211,8 +251,8 @@ function getNewTable() {
   const tbody = document.createElement('tbody');
   table.appendChild(tbody);
   const height = getHeight();
-  for(let i = 0; i < height; i++) {
-    tbody.appendChild(getNewRow());
+  for(let r = 0; r < height; r++) {
+    tbody.appendChild(getNewRow(r));
   }
   return table;
 }
@@ -316,6 +356,10 @@ function displayCoords2Hex(x,y) {
 
 // updates binary input from input switches
 function onInputSwitch(el) {
+  if(circuitMode) {
+    return;
+  }
+
   if(el.classList.contains('on')) {
     el.classList.remove('on');
   } else {
@@ -488,6 +532,198 @@ function drawBorderColor(x,y, color = "black") {
   ctx.stroke();
 }
 
+// returns a boolean array of row n of the active display
+function row2array(n) {
+  return getLights().map(isOn);
+}
+
+// toggle circuit-mode
+function onCircuitSelect() {
+  circuitMode = !circuitMode;
+  const inputLights = Array.from(document.querySelectorAll('#input-lights td'));
+  const displayLights = Array.from(document.querySelectorAll('#lights td'));
+  if(circuitMode) {
+    // enable circuit mode
+    document.querySelector('input#binary').setAttribute('disabled',true);
+    document.querySelector('input#width').setAttribute('disabled',true);
+    document.querySelector('input#height').setAttribute('disabled',true);
+    inputLights.forEach(el => el.classList.add('circ'));
+    displayLights.forEach(el => el.classList.add('circ'));
+    document.querySelector('#circ-pixel-ins').classList.remove('hide');
+  } else {
+    // disable circuit mode
+    document.querySelector('input#binary').removeAttribute('disabled');
+    document.querySelector('input#width').removeAttribute('disabled');
+    document.querySelector('input#height').removeAttribute('disabled');
+    inputLights.forEach(el => el.classList.remove('circ'));
+    displayLights.forEach(el => el.classList.remove('circ'));
+    document.querySelector('#circ-pixel-ins').classList.add('hide');
+    unselectAllDisplay();
+    document.querySelector('input#circuit-out').value = '';
+  }
+
+}
+
+// show the help alert
+function onCircuitHelp() {
+  alert(
+    `
+Click the checkmark to enable circuit-mode, which uses the 8-bit
+input sequences and creates specifications for a minified circuit
+for the display pixel.
+
+The specifications are a series of 8-digit sequences separated
+by bars ('|'), where:
+- '1' means the pin of this 8-bit input position needs to be on
+- '0' means the pin needs to be off
+- 'x' means the pin may be anything, on or off
+- '|' means "or"
+
+note:
+- if the only thing you see is '0', then it means this pixel is off at all times
+- if the only thing you see is 'xxxxxxxx', then it means this pixel is on at all times
+`
+  );
+}
+
+// returns a set of minimal circuits needed to cover
+// all output values, or 0 if there are none
+function getCircuitSequences(outObj) {
+    // returns the maximum bit-container for a given input string
+    // else return 0 if none exists
+    /*
+        note: a 'bit-container' is a sequence of 0's, 1's, and x's
+        a valid bit container results in a 1 in the output object for every input string
+        which can be created by replacing the x's with either a 1 or a 0
+    */
+    const maxContainerCache = {};
+    function getMaxContainer(inString, outObj) {
+        /*
+            set the maxContainer to the input string,
+            for each position which has a 1 or a 0:
+                create newContainer with an x added in this position
+                if it's a valid container
+                    recursively run this function again with the new container
+                    if that is also a valid container, set it to newContainer
+                    if newContainer > maxContainer
+                        maxContainer = newContainer
+            return maxContainer
+        */
+        if (maxContainerCache[inString]) {
+            return maxContainerCache[inString];
+        }
+        let maxContainer = inString;
+        if (!isValidContainer(maxContainer, outObj)) {
+            return 0;
+        }
+        for (let i = 0; i < inString.length; i++) {
+            if (inString[i] == '0' || inString[i] == '1') {
+                let newContainer = getReplacedChar(inString, i, 'x');
+                if (isValidContainer(newContainer, outObj)) {
+                    let subMaxContainer = getMaxContainer(newContainer, outObj);
+                    if (subMaxContainer != 0) {
+                        newContainer = subMaxContainer;
+                    }
+                    if (isLargerContainer(newContainer, maxContainer)) {
+                        maxContainer = newContainer;
+                    }
+                }
+            }
+        }
+        maxContainerCache[inString] = maxContainer;
+        return maxContainer;
+    }
+
+    // returns a new string from input string with the character at i replaced with c
+    function getReplacedChar(str, i, c) {
+        return str.substring(0, i) + c + str.substring(i + 1);
+    }
+
+    // checks if the output for all input string permutations equal 1 in the output object
+    // with the x's in inString replaced by either 0's or 1's
+    function isValidContainer(inString, outObj) {
+        let hasX = false;
+        for (let i = 0; i < inString.length; i++) {
+            if (inString[i] == 'x') {
+                hasX = true;
+                let subString0 = getReplacedChar(inString, i, '0');
+                subString0[i] = '0';
+                if (!isValidContainer(subString0, outObj)) {
+                    return false;
+                }
+                let subString1 = getReplacedChar(inString, i, '1');
+                if (!isValidContainer(subString1, outObj)) {
+                    return false;
+                }
+            }
+        }
+
+        if (!hasX) {
+            if (!outObj[inString]) {
+                return true;
+            } else {
+                return outObj[inString] == '1';
+            }
+        }
+
+        return true;
+    }
+
+    // returns true if containerA has more x's than containerB
+    function isLargerContainer(containerA, containerB) {
+        const aSize = Array.from(containerA).filter(i => i == 'x').length;
+        const bSize = Array.from(containerB).filter(i => i == 'x').length;
+        return aSize > bSize;
+    }
+
+    // returns true if the input binary string is contained by one of the strings
+    // in the container array
+    function isInContainers(inString, containers) {
+        for (let container of containers) {
+            if (isInContainer(inString, container)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    // returns true if the input binary string is contained by one of the strings in the container 
+    function isInContainer(inString, container) {
+        for (let i = 0; i < inString.length; i++) {
+            if (container[i] != 'x' && container[i] != inString[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    // returns an array of the most minimal circuits needed to cover
+    // all output values, or 0 if there are none
+    function getBitContainers(outObj) {
+        // for each binary input string, get the maximum container for it,
+        // add it to a map to ensure this container is uniquely identified,
+        // and return all max containers for all bits
+        const resObj = {};
+        const containers = [];
+        for (let inString of Object.keys(outObj)) {
+            if (!isInContainers(inString, containers)) {
+                const maxContainer = getMaxContainer(inString, outObj);
+                if (maxContainer != 0) {
+                    resObj[maxContainer] = '1';
+                }
+            }
+        }
+        let result = Object.keys(resObj);
+        if (result.length == 0) {
+            return ['0']
+        } else {
+            return result;
+        }
+    }
+
+    return getBitContainers(outObj).join('|');
+}
+
 function main() {
   console.clear();
   createTable();
@@ -506,11 +742,6 @@ function main() {
   initCanvas();
   updateCurrentCanvasDisplay();
   drawBorder(0,0);
-}
-
-// returns a boolean array of row n of the active display
-function row2array(n) {
-  return getLights().map(isOn);
 }
 
 main();

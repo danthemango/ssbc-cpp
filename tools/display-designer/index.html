@@ -5,22 +5,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bullseye!!</title>
+    <title>Display Designer</title>
     <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
-    <!DOCTYPE html>
-    <html lang="en">
-
-    <head>
-        <meta charset="UTF-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Bullseye!!</title>
-        <link rel="stylesheet" href="style.css">
-    </head>
-
     <body>
         <div class="container">
             <div class="item" id="left">
@@ -34,13 +23,13 @@
                                 <div class="option-label">
                                     <label>binary: </label>
                                 </div>
-                                <input id="binary" type="text" maxlength="8" pattern="[02]{0,8}" value="00000000" />
+                                <input id="binary" type="text" maxlength="8" pattern="[01]{0,8}" value="00000000" />
                             </div>
                         </div>
                         <div id="input-lights">
                             <table>
                                 <tr>
-                                    <td></td>
+                                    <td id="test" data-row="hello"></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -51,11 +40,22 @@
                                 </tr>
                             </table>
                         </div>
+                        <div>
+                            <span style="width:35%;">
+                                <input onclick="onCircuitSelect()" style="width:20px;" type="checkbox" id="enable-circuit" />
+                                <label id="enable-circuit-label" for="enable-circuit">Circuit: </label>
+                                <span class="alert-button" onclick="onCircuitHelp()">(?)</span>
+                            </span>
+                            <input id="circuit-out" style="width: 75%;" disabled/>
+                        </div>
                     </div>
-                    <div>
-                        <h2>
-                            display
-                        </h2>
+                    <div style="display: flex;">
+                        <div style="flex: 40%;">
+                            <h2> display </h2>
+                        </div>
+                        <div style="flex: 60%;">
+                            <p class="hide" style="padding-top: 8px;" id="circ-pixel-ins"> ↓ click on a pixel to view its circuit </p>
+                        </div>
                     </div>
                     <div id="array">
                         <div id="options">
